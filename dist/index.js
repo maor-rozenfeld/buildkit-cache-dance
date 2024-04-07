@@ -1235,10 +1235,10 @@ async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheTarget, scrat
     await (0, $evV72$fspromises).mkdir(cacheSource, {
         recursive: true
     });
-    var size = await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
+    var size = (await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
         "-c",
         "du -sh . | cut -f1"
-    ]);
+    ])).stdout;
     console.log(`Cache source: ${cacheSource}`);
     console.log(`Cache source size: ${size}`);
     console.log("Writing docker cache buster and Dockerfile...");
@@ -1351,14 +1351,14 @@ RUN --mount=type=cache,target=${cacheTarget} \
         ]
     ]);
     console.log(`Cache source directory: ${cacheSource}`);
-    console.log(`Cache source original size: ${await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
+    console.log(`Cache source original size: ${(await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
         "-c",
         `du -sh ${cacheSource} | cut -f1`
-    ])}`);
-    console.log(`Cache source extracted size: ${await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
+    ])).stdout}`);
+    console.log(`Cache source extracted size: ${(await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
         "-c",
         `du -sh ${(0, $evV72$path).join(scratchDir, "dance-cache")} | cut -f1`
-    ])}`);
+    ])).stdout}`);
     // Move Cache into Its Place
     await (0, $evV72$fspromises).rm(cacheSource, {
         recursive: true,
