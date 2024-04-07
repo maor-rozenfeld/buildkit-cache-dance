@@ -5,6 +5,8 @@ import { run, runPiped } from './run.js';
 import { spawn } from 'child_process';
 
 async function extractCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
+    console.log(`Caches:`)
+    console.log((await run('/bin/sh', ['-c', 'docker system df -v | grep cachemount'])).stdout);
     console.log(`Creating docker cache buster and Dockerfile...`);
     const date = new Date().toISOString();
     await fs.writeFile(path.join(scratchDir, 'buildstamp'), date);
