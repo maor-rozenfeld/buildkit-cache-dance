@@ -1237,7 +1237,7 @@ async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheTarget, scrat
     });
     var size = (await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
         "-c",
-        "du -sh . | cut -f1"
+        `du -sh ${cacheSource} | cut -f1`
     ])).stdout;
     console.log(`Cache source: ${cacheSource}`);
     console.log(`Cache source size: ${size}`);
