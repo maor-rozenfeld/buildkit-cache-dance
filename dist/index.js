@@ -1290,10 +1290,19 @@ async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
 
 async function $8d40300f3635b768$var$extractCache(cacheSource, cacheTarget, scratchDir) {
     console.log(`Caches:`);
-    console.log((await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
-        "-c",
-        "docker system df -v | grep cachemount"
-    ])).stdout);
+    try {
+        console.log((await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
+            "system",
+            "df",
+            "-v"
+        ])).stdout);
+        console.log((await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
+            "-c",
+            "docker system df -v | grep cachemount"
+        ])).stdout);
+    } catch (error) {
+        console.error(error);
+    }
     console.log(`Creating docker cache buster and Dockerfile...`);
     const date = new Date().toISOString();
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "buildstamp"), date);
@@ -1355,6 +1364,14 @@ RUN --mount=type=cache,target=${cacheTarget} \
             scratchDir
         ]
     ]);
+    console.log((await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
+        "-c",
+        `pwd`
+    ])).stdout);
+    console.log((await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
+        "-c",
+        `ls -al`
+    ])).stdout);
     console.log(`Cache source directory: ${cacheSource}`);
     console.log(`Cache source original size: ${(await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
         "-c",

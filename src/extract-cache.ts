@@ -6,7 +6,13 @@ import { spawn } from 'child_process';
 
 async function extractCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
     console.log(`Caches:`)
-    console.log((await run('/bin/sh', ['-c', 'docker system df -v | grep cachemount'])).stdout);
+    try {
+        console.log((await run('docker', ['system', 'df', '-v'])).stdout);
+        console.log((await run('/bin/sh', ['-c', 'docker system df -v | grep cachemount'])).stdout);
+    }
+    catch (error) {
+        console.error(error);
+    }
     console.log(`Creating docker cache buster and Dockerfile...`);
     const date = new Date().toISOString();
     await fs.writeFile(path.join(scratchDir, 'buildstamp'), date);
@@ -41,6 +47,8 @@ RUN --mount=type=cache,target=${cacheTarget} \
         ['tar', ['-H', 'posix', '-x', '-C', scratchDir]]
     );
 
+    console.log((await run('/bin/sh', ['-c', `pwd`])).stdout)
+    console.log((await run('/bin/sh', ['-c', `ls -al`])).stdout)
     console.log(`Cache source directory: ${cacheSource}`);
     console.log(`Cache source original size: ${(await run('/bin/sh', ['-c', `du -sh ${cacheSource} | cut -f1`])).stdout}`);
     console.log(`Cache source extracted size: ${(await run('/bin/sh', ['-c', `du -sh ${path.join(scratchDir, 'dance-cache')} | cut -f1`])).stdout}`);
