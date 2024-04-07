@@ -1224,7 +1224,7 @@ function $4c028fad90f63861$var$assertSuccess(cp) {
 
 
 async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheTarget, scratchDir) {
-    // Clean Scratch Directory
+    console.log(`Cleaning existing scratch directory ${scratchDir}...`);
     await (0, $evV72$fspromises).rm(scratchDir, {
         recursive: true,
         force: true
@@ -1232,11 +1232,16 @@ async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheTarget, scrat
     await (0, $evV72$fspromises).mkdir(scratchDir, {
         recursive: true
     });
-    // Prepare Cache Source Directory
     await (0, $evV72$fspromises).mkdir(cacheSource, {
         recursive: true
     });
-    // Prepare Timestamp for Layer Cache Busting
+    var size = await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
+        "-c",
+        "du -sh . | cut -f1"
+    ]);
+    console.log(`Cache source: ${cacheSource}`);
+    console.log(`Cache source size: ${size}`);
+    console.log("Writing docker cache buster and Dockerfile...");
     const date = new Date().toISOString();
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(cacheSource, "buildstamp"), date);
     // Prepare Dancefile to Access Caches
@@ -1249,6 +1254,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
 `;
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "Dancefile.inject"), dancefileContent);
     console.log(dancefileContent);
+    console.log("Injecting cache into docker...");
     // Inject Data into Docker Cache
     await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
         "buildx",
@@ -1283,7 +1289,7 @@ async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
 
 
 async function $8d40300f3635b768$var$extractCache(cacheSource, cacheTarget, scratchDir) {
-    // Prepare Timestamp for Layer Cache Busting
+    console.log(`Creating docker cache buster and Dockerfile...`);
     const date = new Date().toISOString();
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "buildstamp"), date);
     // Prepare Dancefile to Access Caches
@@ -1296,7 +1302,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
 `;
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "Dancefile.extract"), dancefileContent);
     console.log(dancefileContent);
-    // Extract Data into Docker Image
+    console.log("Building docker image...");
     await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
         "buildx",
         "build",
@@ -1317,6 +1323,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
     } catch (error) {
     // Ignore error if container does not exist
     }
+    console.log(`Extracting cache to scratch dir ${scratchDir}...`);
     await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
         "create",
         "-ti",
@@ -1343,12 +1350,22 @@ RUN --mount=type=cache,target=${cacheTarget} \
             scratchDir
         ]
     ]);
+    console.log(`Cache source directory: ${cacheSource}`);
+    console.log(`Cache source original size: ${await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
+        "-c",
+        `du -sh ${cacheSource} | cut -f1`
+    ])}`);
+    console.log(`Cache source extracted size: ${await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
+        "-c",
+        `du -sh ${(0, $evV72$path).join(scratchDir, "dance-cache")} | cut -f1`
+    ])}`);
     // Move Cache into Its Place
     await (0, $evV72$fspromises).rm(cacheSource, {
         recursive: true,
         force: true
     });
     await (0, $evV72$fspromises).rename((0, $evV72$path).join(scratchDir, "dance-cache"), cacheSource);
+    console.log("Replaced cache source with the extracted cache.");
 }
 async function $8d40300f3635b768$export$bd3cfa0c41fc7012(opts) {
     if (opts["skip-extraction"]) {
