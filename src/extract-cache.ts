@@ -5,7 +5,7 @@ import { run, runPiped } from './run.js';
 import { spawn } from 'child_process';
 
 async function extractCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
-    // Prepare Timestamp for Layer Cache Busting
+    console.log(`Creating docker cache buster and Dockerfile...`);
     const date = new Date().toISOString();
     await fs.writeFile(path.join(scratchDir, 'buildstamp'), date);
 
@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
     await fs.writeFile(path.join(scratchDir, 'Dancefile.extract'), dancefileContent);
     console.log(dancefileContent);
 
-    // Extract Data into Docker Image
+    console.log('Building docker image...')
     await run('docker', ['buildx', 'build', '-f', path.join(scratchDir, 'Dancefile.extract'), '--tag', 'dance:extract', '--load', scratchDir]);
 
     // Create Extraction Image
@@ -29,6 +29,8 @@ RUN --mount=type=cache,target=${cacheTarget} \
     } catch (error) {
         // Ignore error if container does not exist
     }
+
+    console.log(`Extracting cache to scratch dir ${scratchDir}...`)
     await run('docker', ['create', '-ti', '--name', 'cache-container', 'dance:extract']);
 
     // Unpack Docker Image into Scratch
@@ -37,9 +39,13 @@ RUN --mount=type=cache,target=${cacheTarget} \
         ['tar', ['-H', 'posix', '-x', '-C', scratchDir]]
     );
 
+    console.log(`Cache source directory: ${cacheSource}`);
+    console.log(`Cache source original size: ${await run('/bin/sh', ['-c', `du -sh ${cacheSource} | cut -f1`])}`);
+    console.log(`Cache source extracted size: ${await run('/bin/sh', ['-c', `du -sh ${path.join(scratchDir, 'dance-cache')} | cut -f1`])}`);
     // Move Cache into Its Place
     await fs.rm(cacheSource, { recursive: true, force: true });
     await fs.rename(path.join(scratchDir, 'dance-cache'), cacheSource);
+    console.log('Replaced cache source with the extracted cache.');
 }
 
 export async function extractCaches(opts: Opts) {

@@ -5,14 +5,17 @@ import { run } from './run.js';
 import { notice } from '@actions/core';
 
 async function injectCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
-    // Clean Scratch Directory
+
+    console.log(`Cleaning existing scratch directory ${scratchDir}...`)
     await fs.rm(scratchDir, { recursive: true, force: true });
     await fs.mkdir(scratchDir, { recursive: true });
 
-    // Prepare Cache Source Directory
     await fs.mkdir(cacheSource, { recursive: true });
+    var size = await run('/bin/sh', ['-c', 'du -sh . | cut -f1']);
+    console.log(`Cache source: ${cacheSource}`);
+    console.log(`Cache source size: ${size}`);
 
-    // Prepare Timestamp for Layer Cache Busting
+    console.log('Writing docker cache buster and Dockerfile...');
     const date = new Date().toISOString();
     await fs.writeFile(path.join(cacheSource, 'buildstamp'), date);
 
@@ -27,6 +30,8 @@ RUN --mount=type=cache,target=${cacheTarget} \
     await fs.writeFile(path.join(scratchDir, 'Dancefile.inject'), dancefileContent);
     console.log(dancefileContent);
 
+
+    console.log('Injecting cache into docker...')
     // Inject Data into Docker Cache
     await run('docker', ['buildx', 'build', '-f', path.join(scratchDir, 'Dancefile.inject'), '--tag', 'dance:inject', cacheSource]);
 
