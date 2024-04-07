@@ -40,8 +40,8 @@ RUN --mount=type=cache,target=${cacheTarget} \
     );
 
     console.log(`Cache source directory: ${cacheSource}`);
-    console.log(`Cache source original size: ${await run('/bin/sh', ['-c', `du -sh ${cacheSource} | cut -f1`])}`);
-    console.log(`Cache source extracted size: ${await run('/bin/sh', ['-c', `du -sh ${path.join(scratchDir, 'dance-cache')} | cut -f1`])}`);
+    console.log(`Cache source original size: ${(await run('/bin/sh', ['-c', `du -sh ${cacheSource} | cut -f1`])).stdout}`);
+    console.log(`Cache source extracted size: ${(await run('/bin/sh', ['-c', `du -sh ${path.join(scratchDir, 'dance-cache')} | cut -f1`])).stdout}`);
     // Move Cache into Its Place
     await fs.rm(cacheSource, { recursive: true, force: true });
     await fs.rename(path.join(scratchDir, 'dance-cache'), cacheSource);

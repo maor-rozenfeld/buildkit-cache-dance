@@ -11,7 +11,7 @@ async function injectCache(cacheSource: string, cacheTarget: string, scratchDir:
     await fs.mkdir(scratchDir, { recursive: true });
 
     await fs.mkdir(cacheSource, { recursive: true });
-    var size = await run('/bin/sh', ['-c', 'du -sh . | cut -f1']);
+    var size = (await run('/bin/sh', ['-c', 'du -sh . | cut -f1'])).stdout;
     console.log(`Cache source: ${cacheSource}`);
     console.log(`Cache source size: ${size}`);
 
