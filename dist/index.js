@@ -1250,21 +1250,25 @@ FROM busybox:1
 COPY buildstamp buildstamp
 RUN --mount=type=cache,target=${cacheTarget} \
     --mount=type=bind,source=.,target=/var/dance-cache \
-    cp -p -R /var/dance-cache/. ${cacheTarget} || true
+    ls -al ${cacheTarget} && cp -p -R /var/dance-cache/. ${cacheTarget} || true
 `;
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "Dancefile.inject"), dancefileContent);
     console.log(dancefileContent);
     console.log("Injecting cache into docker...");
     // Inject Data into Docker Cache
-    await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
+    const { stdout: stdout, stderr: stderr } = await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
         "buildx",
         "build",
         "-f",
         (0, $evV72$path).join(scratchDir, "Dancefile.inject"),
         "--tag",
         "dance:inject",
+        "--progress",
+        "plain",
         cacheSource
     ]);
+    console.log(stdout);
+    console.log(stderr);
     // Clean Directories
     try {
         await (0, $evV72$fspromises).rm(cacheSource, {
@@ -1296,10 +1300,6 @@ async function $8d40300f3635b768$var$extractCache(cacheSource, cacheTarget, scra
             "df",
             "-v"
         ])).stdout);
-        console.log((await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
-            "-c",
-            "docker system df -v | grep cachemount"
-        ])).stdout);
     } catch (error) {
         console.error(error);
     }
@@ -1311,22 +1311,26 @@ async function $8d40300f3635b768$var$extractCache(cacheSource, cacheTarget, scra
 FROM busybox:1
 COPY buildstamp buildstamp
 RUN --mount=type=cache,target=${cacheTarget} \
-    mkdir -p /var/dance-cache/ \
+    ls -al ${cacheTarget} && mkdir -p /var/dance-cache/ \
     && cp -p -R ${cacheTarget}/. /var/dance-cache/ || true
 `;
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "Dancefile.extract"), dancefileContent);
     console.log(dancefileContent);
     console.log("Building docker image...");
-    await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
+    const { stdout: stdout, stderr: stderr } = await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
         "buildx",
         "build",
         "-f",
         (0, $evV72$path).join(scratchDir, "Dancefile.extract"),
         "--tag",
         "dance:extract",
+        "--progress",
+        "plain",
         "--load",
         scratchDir
     ]);
+    console.log(stdout);
+    console.log(stderr);
     // Create Extraction Image
     try {
         await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
@@ -1370,7 +1374,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
     ])).stdout);
     console.log((await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
         "-c",
-        `ls -al`
+        `ls -al ${cacheSource}`
     ])).stdout);
     console.log(`Cache source directory: ${cacheSource}`);
     console.log(`Cache source original size: ${(await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [

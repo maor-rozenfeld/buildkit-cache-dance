@@ -8,7 +8,6 @@ async function extractCache(cacheSource: string, cacheTarget: string, scratchDir
     console.log(`Caches:`)
     try {
         console.log((await run('docker', ['system', 'df', '-v'])).stdout);
-        console.log((await run('/bin/sh', ['-c', 'docker system df -v | grep cachemount'])).stdout);
     }
     catch (error) {
         console.error(error);
@@ -22,14 +21,17 @@ async function extractCache(cacheSource: string, cacheTarget: string, scratchDir
 FROM busybox:1
 COPY buildstamp buildstamp
 RUN --mount=type=cache,target=${cacheTarget} \
-    mkdir -p /var/dance-cache/ \
+    ls -al ${cacheTarget} && mkdir -p /var/dance-cache/ \
     && cp -p -R ${cacheTarget}/. /var/dance-cache/ || true
 `;
     await fs.writeFile(path.join(scratchDir, 'Dancefile.extract'), dancefileContent);
     console.log(dancefileContent);
 
     console.log('Building docker image...')
-    await run('docker', ['buildx', 'build', '-f', path.join(scratchDir, 'Dancefile.extract'), '--tag', 'dance:extract', '--load', scratchDir]);
+    const {stdout, stderr} = await run('docker', ['buildx', 'build', '-f', path.join(scratchDir, 'Dancefile.extract'),
+        '--tag', 'dance:extract','--progress', 'plain', '--load', scratchDir]);
+    console.log(stdout);
+    console.log(stderr);
 
     // Create Extraction Image
     try {
@@ -48,7 +50,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
     );
 
     console.log((await run('/bin/sh', ['-c', `pwd`])).stdout)
-    console.log((await run('/bin/sh', ['-c', `ls -al`])).stdout)
+    console.log((await run('/bin/sh', ['-c', `ls -al ${cacheSource}`])).stdout)
     console.log(`Cache source directory: ${cacheSource}`);
     console.log(`Cache source original size: ${(await run('/bin/sh', ['-c', `du -sh ${cacheSource} | cut -f1`])).stdout}`);
     console.log(`Cache source extracted size: ${(await run('/bin/sh', ['-c', `du -sh ${path.join(scratchDir, 'dance-cache')} | cut -f1`])).stdout}`);
