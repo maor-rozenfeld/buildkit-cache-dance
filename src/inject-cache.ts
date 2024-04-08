@@ -5,8 +5,9 @@ import { run } from './run.js';
 import { notice } from '@actions/core';
 
 async function injectCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
+    console.log(`Injecting cache from ${cacheSource} to ${cacheTarget}...`);
 
-    console.log(`Cleaning existing scratch directory ${scratchDir}...`)
+    console.log(`Cleaning existing scratch directory ${scratchDir}...`);
     await fs.rm(scratchDir, { recursive: true, force: true });
     await fs.mkdir(scratchDir, { recursive: true });
 
@@ -45,6 +46,8 @@ RUN --mount=type=cache,target=${cacheTarget} \
         // Ignore Cleaning Errors
         notice(`Error while cleaning cache source directory: ${err}. Ignoring...`);
     }
+
+    console.log('\n\n')
 }
 
 

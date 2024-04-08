@@ -1224,6 +1224,7 @@ function $4c028fad90f63861$var$assertSuccess(cp) {
 
 
 async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheTarget, scratchDir) {
+    console.log(`Injecting cache from ${cacheSource} to ${cacheTarget}...`);
     console.log(`Cleaning existing scratch directory ${scratchDir}...`);
     await (0, $evV72$fspromises).rm(scratchDir, {
         recursive: true,
@@ -1279,6 +1280,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
         // Ignore Cleaning Errors
         (0, $bbb9dac42384d004$exports.notice)(`Error while cleaning cache source directory: ${err}. Ignoring...`);
     }
+    console.log("\n\n");
 }
 async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
     const cacheMap = (0, $76d06fcdc9bff1f5$export$8550a4d7282a21d0)(opts);
@@ -1293,7 +1295,8 @@ async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
 
 
 async function $8d40300f3635b768$var$extractCache(cacheSource, cacheTarget, scratchDir) {
-    console.log(`Caches:`);
+    console.log(`Extracting cache from ${cacheSource} to ${cacheTarget}...`);
+    console.log(`Docker volumes:`);
     try {
         console.log((await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
             "system",
@@ -1392,6 +1395,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
     });
     await (0, $evV72$fspromises).rename((0, $evV72$path).join(scratchDir, "dance-cache"), cacheSource);
     console.log("Replaced cache source with the extracted cache.");
+    console.log("\n\n");
 }
 async function $8d40300f3635b768$export$bd3cfa0c41fc7012(opts) {
     if (opts["skip-extraction"]) {

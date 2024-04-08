@@ -5,7 +5,9 @@ import { run, runPiped } from './run.js';
 import { spawn } from 'child_process';
 
 async function extractCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
-    console.log(`Caches:`)
+    console.log(`Extracting cache from ${cacheSource} to ${cacheTarget}...`)
+
+    console.log(`Docker volumes:`)
     try {
         console.log((await run('docker', ['system', 'df', '-v'])).stdout);
     }
@@ -58,6 +60,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
     await fs.rm(cacheSource, { recursive: true, force: true });
     await fs.rename(path.join(scratchDir, 'dance-cache'), cacheSource);
     console.log('Replaced cache source with the extracted cache.');
+    console.log('\n\n')
 }
 
 export async function extractCaches(opts: Opts) {
