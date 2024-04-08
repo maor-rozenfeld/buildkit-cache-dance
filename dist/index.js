@@ -1250,7 +1250,7 @@ FROM busybox:1
 COPY buildstamp buildstamp
 RUN --mount=type=cache,target=${cacheTarget} \
     --mount=type=bind,source=.,target=/var/dance-cache \
-    ls -al ${cacheTarget} && cp -p -R /var/dance-cache/. ${cacheTarget} || true
+    ls -al /var/dance-cache && cp -p -R /var/dance-cache/. ${cacheTarget} || true
 `;
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "Dancefile.inject"), dancefileContent);
     console.log(dancefileContent);
@@ -1374,7 +1374,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
     ])).stdout);
     console.log((await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [
         "-c",
-        `ls -al ${cacheSource}`
+        `ls -al ${(0, $evV72$path).join(scratchDir, "dance-cache")}`
     ])).stdout);
     console.log(`Cache source directory: ${cacheSource}`);
     console.log(`Cache source original size: ${(await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("/bin/sh", [

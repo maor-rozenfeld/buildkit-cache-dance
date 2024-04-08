@@ -50,7 +50,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
     );
 
     console.log((await run('/bin/sh', ['-c', `pwd`])).stdout)
-    console.log((await run('/bin/sh', ['-c', `ls -al ${cacheSource}`])).stdout)
+    console.log((await run('/bin/sh', ['-c', `ls -al ${path.join(scratchDir, 'dance-cache')}`])).stdout)
     console.log(`Cache source directory: ${cacheSource}`);
     console.log(`Cache source original size: ${(await run('/bin/sh', ['-c', `du -sh ${cacheSource} | cut -f1`])).stdout}`);
     console.log(`Cache source extracted size: ${(await run('/bin/sh', ['-c', `du -sh ${path.join(scratchDir, 'dance-cache')} | cut -f1`])).stdout}`);

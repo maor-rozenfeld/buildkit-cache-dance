@@ -25,7 +25,7 @@ FROM busybox:1
 COPY buildstamp buildstamp
 RUN --mount=type=cache,target=${cacheTarget} \
     --mount=type=bind,source=.,target=/var/dance-cache \
-    ls -al ${cacheTarget} && cp -p -R /var/dance-cache/. ${cacheTarget} || true
+    ls -al /var/dance-cache && cp -p -R /var/dance-cache/. ${cacheTarget} || true
 `;
     await fs.writeFile(path.join(scratchDir, 'Dancefile.inject'), dancefileContent);
     console.log(dancefileContent);
