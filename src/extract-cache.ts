@@ -7,13 +7,6 @@ import { spawn } from 'child_process';
 async function extractCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
     console.log(`Extracting cache from ${cacheSource} to ${cacheTarget}...`)
 
-    console.log(`Docker volumes:`)
-    try {
-        console.log((await run('docker', ['system', 'df', '-v'])).stdout);
-    }
-    catch (error) {
-        console.error(error);
-    }
     console.log(`Creating docker cache buster and Dockerfile...`);
     const date = new Date().toISOString();
     await fs.writeFile(path.join(scratchDir, 'buildstamp'), date);
